@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Values</title>
+<style>
+  :root { --d: min(calc(100vh - 150px), 52vw); }
+  body { margin: 0; background: #2a2a2a; color: #f3eee8; font-family: "Segoe UI", Arial, sans-serif; }
+  header { text-align: center; padding-top: 12px; }
+  h1 { margin: 0; font-weight: 300; letter-spacing: .25em; font-size: 40px; }
+  p.sub { margin: 4px 0 8px; font-size: 20px; color: #d8d0c6; }
+  main { display: flex; gap: 24px; padding: 0 24px 16px; align-items: flex-start; justify-content: center; }
+  #side { flex: 1 1 0; max-width: 520px; min-width: 0; }
+  .blk { margin-bottom: 12px; }
+  .blk h2 { margin: 0; font-weight: 400; font-size: 24px; display: flex; gap: .4em; align-items: baseline; }
+  .blk h2 .n { color: #b7a994; font-weight: 600; }
+  .blk h2 .m:empty::before { content: "my value"; color: #7d7466; }
+  .blk .p { font-size: 14px; color: #b9b0a4; margin: 2px 0 4px; }
+  .notes { min-height: 2.6em; padding: 6px 10px; border-left: 3px solid #b7a994; background: rgba(255,255,255,.05); border-radius: 0 6px 6px 0; font-size: 17px; line-height: 1.3; outline: none; white-space: pre-wrap; }
+  .notes:empty::before { content: attr(data-ph); color: #7d7466; }
+  .notes:focus { background: rgba(255,255,255,.12); }
+  #rings { position: relative; width: var(--d); height: var(--d); flex: none; }
+  .ring { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); border-radius: 50%; color: #2a2a2a; }
+  .t { position: absolute; top: 0; left: 50%; transform: translateX(-50%); height: calc(var(--d) * .18);
+       display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  #r1 .t { height: 100%; }
+  .e { outline: none; min-width: 3em; max-width: 100%; }
+  .v { font-size: max(calc(var(--d) * .042), 15px); font-weight: 600; line-height: 1.15; }
+  .w { font-size: max(calc(var(--d) * .027), 12px); line-height: 1.25; margin-top: .15em; }
+  .e:empty::before { content: attr(data-ph); color: #8a7f6f; font-weight: 400; }
+  .e:focus { background: rgba(255,255,255,.45); border-radius: 6px; }
+  #r5 { width: var(--d);          height: var(--d);          background: #e8e2da; }
+  #r4 { width: calc(var(--d)*.82); height: calc(var(--d)*.82); background: #d9d0c5; }
+  #r3 { width: calc(var(--d)*.64); height: calc(var(--d)*.64); background: #cfc4b5; }
+  #r2 { width: calc(var(--d)*.46); height: calc(var(--d)*.46); background: #c2b5a3; }
+  #r1 { width: calc(var(--d)*.28); height: calc(var(--d)*.28); background: #b7a994; }
+  #r5 .t { width: calc(var(--d)*.50); }
+  #r4 .t { width: calc(var(--d)*.46); }
+  #r3 .t { width: calc(var(--d)*.40); }
+  #r2 .t { width: calc(var(--d)*.32); }
+  #r1 .t { width: calc(var(--d)*.24); }
+  button { position: fixed; top: 10px; right: 10px; background: none; border: 1px solid #666; color: #999; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  @media (max-width: 800px) {          /* phones: rings on top, notes below */
+    :root { --d: 96vw; }
+    main { flex-direction: column-reverse; align-items: center; padding: 0 8px 16px; }
+    #side { width: 100%; max-width: none; }
+  }
+</style>
+</head>
+<body>
+<button id="clear">Clear</button>
+<header><h1>VALUES</h1><p class="sub">What shapes you shapes your decisions</p></header>
+<main>
+  <section id="side"></section>
+  <div id="rings"></div>
+</main>
+<script>
+  // Both columns are generated from one list so ring order and note order cannot drift.
+  // shortcut: autosaves to this browser's localStorage only; no export. Screenshot when done.
+  const PROMPT = ["How do I live this every day?", "What is one thing I do for this?", "How do I practice this?", "How do I show this to others?", "What is one small step this week?"];
+  const ringsEl = document.getElementById('rings'), side = document.getElementById('side');
+  for (let n = 5; n >= 1; n--)   // outer ring first so the center ring paints on top
+    ringsEl.insertAdjacentHTML('beforeend', `<div class="ring" id="r${n}"><div class="t"><div class="e v" contenteditable="plaintext-only" data-ph="#${n}${n === 1 ? ' most important' : ''}"></div><div class="e w" contenteditable="plaintext-only" data-ph="why"></div></div></div>`);
+  for (let n = 5; n >= 1; n--)   // same top-to-bottom order as the rings: #5 on top, #1 at the bottom
+    side.insertAdjacentHTML('beforeend', `<div class="blk"><h2><span class="n">#${n}</span><span class="m" data-n="${n}"></span></h2><div class="p">${PROMPT[n - 1]}</div><div class="notes" contenteditable="plaintext-only" data-ph="Write here"></div></div>`);
+
+  const ring = n => document.querySelector(`#r${n} .v`);
+  const els = [...document.querySelectorAll('.e'), ...document.querySelectorAll('.notes')], KEY = 'coreValuesV2';
+  const mirror = () => document.querySelectorAll('.blk .m').forEach(m => m.textContent = ring(m.dataset.n).textContent);
+  const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+  els.forEach((el, i) => { el.textContent = saved[i] || ''; });
+  mirror();
+  document.addEventListener('input', () => { mirror(); localStorage.setItem(KEY, JSON.stringify(els.map(e => e.textContent))); });
+  document.addEventListener('keydown', e => {   // Enter in a ring box moves to the next box; notes keep Enter for new lines
+    if (e.key === 'Enter' && e.target.classList.contains('e')) { e.preventDefault(); (els[els.indexOf(e.target) + 1] || e.target).focus(); }
+  });
+  document.getElementById('clear').onclick = () => { if (confirm('Clear everything?')) { els.forEach(e => e.textContent = ''); mirror(); localStorage.removeItem(KEY); } };
+</script>
+</body>
+</html>
