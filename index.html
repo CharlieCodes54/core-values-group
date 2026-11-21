@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Values</title>
+<style>
+  :root { --d: min(calc(100vh - 150px), 96vw); }
+  body { margin: 0; background: #2a2a2a; color: #f3eee8; font-family: "Segoe UI", Arial, sans-serif; }
+  h1 { margin: 14px 0 0; text-align: center; font-weight: 300; letter-spacing: .25em; font-size: 40px; }
+  p.sub { margin: 4px 0 12px; text-align: center; font-size: 20px; color: #d8d0c6; }
+  #rings { position: relative; width: var(--d); height: var(--d); margin: 0 auto; }
+  .ring { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); border-radius: 50%; color: #2a2a2a; }
+  .t { position: absolute; top: 0; left: 50%; transform: translateX(-50%); height: calc(var(--d) * .18);
+       display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  #r1 .t { height: 100%; }
+  .e { outline: none; min-width: 3em; max-width: 100%; }
+  .v { font-size: max(calc(var(--d) * .042), 15px); font-weight: 600; line-height: 1.15; }
+  .w { font-size: max(calc(var(--d) * .027), 12px); line-height: 1.25; margin-top: .15em; }
+  .e:empty::before { content: attr(data-ph); color: #8a7f6f; font-weight: 400; }
+  .e:focus { background: rgba(255,255,255,.45); border-radius: 6px; }
+  #r5 { width: var(--d);          height: var(--d);          background: #e8e2da; }
+  #r4 { width: calc(var(--d)*.82); height: calc(var(--d)*.82); background: #d9d0c5; }
+  #r3 { width: calc(var(--d)*.64); height: calc(var(--d)*.64); background: #cfc4b5; }
+  #r2 { width: calc(var(--d)*.46); height: calc(var(--d)*.46); background: #c2b5a3; }
+  #r1 { width: calc(var(--d)*.28); height: calc(var(--d)*.28); background: #b7a994; }
+  #r5 .t { width: calc(var(--d)*.50); }
+  #r4 .t { width: calc(var(--d)*.46); }
+  #r3 .t { width: calc(var(--d)*.40); }
+  #r2 .t { width: calc(var(--d)*.32); }
+  #r1 .t { width: calc(var(--d)*.24); }
+  button { position: fixed; top: 10px; right: 10px; background: none; border: 1px solid #666; color: #999; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+<button id="clear">Clear</button>
+<h1>VALUES</h1>
+<p class="sub">What shapes you shapes your decisions</p>
+<div id="rings">
+  <div class="ring" id="r5"><div class="t"><div class="e v" contenteditable="plaintext-only" data-ph="#5"></div><div class="e w" contenteditable="plaintext-only" data-ph="why"></div></div></div>
+  <div class="ring" id="r4"><div class="t"><div class="e v" contenteditable="plaintext-only" data-ph="#4"></div><div class="e w" contenteditable="plaintext-only" data-ph="why"></div></div></div>
+  <div class="ring" id="r3"><div class="t"><div class="e v" contenteditable="plaintext-only" data-ph="#3"></div><div class="e w" contenteditable="plaintext-only" data-ph="why"></div></div></div>
+  <div class="ring" id="r2"><div class="t"><div class="e v" contenteditable="plaintext-only" data-ph="#2"></div><div class="e w" contenteditable="plaintext-only" data-ph="why"></div></div></div>
+  <div class="ring" id="r1"><div class="t"><div class="e v" contenteditable="plaintext-only" data-ph="#1 most important"></div><div class="e w" contenteditable="plaintext-only" data-ph="why"></div></div></div>
+</div>
+<script>
+  // shortcut: autosaves to this browser's localStorage only; no export. Screen-share the tab, or screenshot it.
+  const els = [...document.querySelectorAll('.e')], KEY = 'coreValuesDisplay';
+  const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+  els.forEach((el, i) => { el.textContent = saved[i] || ''; });
+  document.addEventListener('input', () => localStorage.setItem(KEY, JSON.stringify(els.map(e => e.textContent))));
+  document.addEventListener('keydown', e => {            // Enter moves to the next box instead of adding a line
+    if (e.key === 'Enter' && e.target.classList.contains('e')) { e.preventDefault(); (els[els.indexOf(e.target) + 1] || e.target).focus(); }
+  });
+  document.getElementById('clear').onclick = () => { if (confirm('Clear all rings?')) { els.forEach(e => e.textContent = ''); localStorage.removeItem(KEY); } };
+</script>
+</body>
+</html>
